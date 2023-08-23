@@ -1,0 +1,32 @@
+const userSchema = require('../models/user');
+
+function getUsers(req, res) {
+  return userSchema.find().then((r) => res.status(200).send(r)).catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+}
+
+function getUserById(req, res) {
+  const { userId } = req.params;
+  return userSchema.findById(userId).then((r) => {
+    if (r === null) {
+      return res.status(404).send({ message: 'Пользователь не найден' });
+    }
+    return res.status(200).send(r);
+  });
+}
+
+function createUser(req, res) {
+  const { name, about, avatar } = req.body;
+  return userSchema.create({ name, about, avatar }).then((r) => res.status(201).send(r))
+  .catch((err) => {
+    if (err.name === 'ValidationError') {
+      return res.status(400).send({ message: 'Неверные данные' });
+    }
+    return res.status(500).send({ message: 'Ошибка сервера' });
+  });;
+}
+
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+};
