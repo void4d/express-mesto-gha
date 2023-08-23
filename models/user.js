@@ -12,8 +12,6 @@ const userSchema = new mongoose.Schema({
   about: {
     type: String,
   },
-  likes: Array,
-  createdAt: Date,
 });
 
 module.exports = mongoose.model('user', userSchema);
