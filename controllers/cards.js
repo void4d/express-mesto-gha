@@ -26,11 +26,16 @@ function deleteCard(req, res) {
     .findByIdAndDelete(req.params.cardId)
     .then((r) => {
       if (!r) {
-        res.status(400).send({ message: 'Карточка не найдена' });
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
       res.status(200).send(r);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Неверный id' });
+      }
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    });
 }
 
 function putLike(req, res) {
@@ -38,11 +43,16 @@ function putLike(req, res) {
     .findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((r) => {
       if (!r) {
-        res.status(400).send({ message: 'Карточка не найдена' });
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
       res.status(200).send(r);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Неверный id' });
+      }
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    });
 }
 
 function deleteLike(req, res) {
@@ -54,7 +64,12 @@ function deleteLike(req, res) {
       }
       res.status(200).send(r);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Неверный id' });
+      }
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    });
 }
 
 module.exports = {
