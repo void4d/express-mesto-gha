@@ -12,8 +12,13 @@ function getUserById(req, res) {
 
   return userSchema
     .findById(userId)
-    .then((r) => res.status(200).send(r))
-    .catch(() => res.status(404).send({ message: 'Пользователь не найден' }));
+    .then((r) => {
+      if (!r) {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      res.status(200).send(r);
+    })
+    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
 }
 
 function createUser(req, res) {
