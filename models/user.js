@@ -8,9 +8,13 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
+    required: true,
+    minlength: 2,
   },
   about: {
     type: String,
+    required: true,
+    minlength: 2,
   },
 });
 

@@ -1,8 +1,16 @@
 const mongoose = require('mongoose');
 
 const cardSchema = new mongoose.Schema({
-  name: String,
-  link: String,
+  name: {
+    type: String,
+    required: true,
+    minlength: 2,
+  },
+  link: {
+    type: String,
+    required: true,
+    minlength: 2,
+  },
   owner: mongoose.Schema.Types.ObjectId,
   likes: [
     {
