@@ -12,15 +12,13 @@ function getUserById(req, res) {
 
   return userSchema
     .findById(userId)
+    .orFail(new Error('Неверный id'))
     .then((r) => {
-      if (!r) {
-        res.status(404).send({ message: 'Пользователь с таким id не найден' });
-      }
       res.status(200).send(r);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Неверный id' });
+      if (err.message === 'Неверный id') {
+        return res.status(404).send({ message: 'Пользователь с таким id не найден' });
       }
       return res.status(500).send({ message: 'Ошибка сервера' });
     });
@@ -31,7 +29,13 @@ function createUser(req, res) {
   return userSchema
     .create({ name, about, avatar })
     .then((r) => res.status(201).send(r))
-    .catch(() => res.status(400).send({ message: 'Неверные данные' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Неверные данные' });
+      }
+
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    });
 }
 
 function updateUser(req, res) {
