@@ -18,7 +18,12 @@ function getUserById(req, res) {
       }
       res.status(200).send(r);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Неверный id' });
+      }
+      return res.status(500).send({ message: 'Ошибка сервера' });
+    });
 }
 
 function createUser(req, res) {
