@@ -26,7 +26,7 @@ function deleteCard(req, res) {
     .findByIdAndDelete(req.params.cardId)
     .then((r) => {
       if (!r) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Карточка не найдена' });
       }
       res.status(200).send(r);
     })
@@ -38,7 +38,7 @@ function putLike(req, res) {
     .findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((r) => {
       if (!r) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Карточка не найдена' });
       }
       res.status(200).send(r);
     })
@@ -50,7 +50,7 @@ function deleteLike(req, res) {
     .findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((r) => {
       if (!r) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Карточка не найдена' });
       }
       res.status(200).send(r);
     })
