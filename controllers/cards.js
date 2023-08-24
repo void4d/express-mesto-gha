@@ -24,21 +24,36 @@ function createCard(req, res) {
 function deleteCard(req, res) {
   return cardSchema
     .findByIdAndDelete(req.params.cardId)
-    .then((r) => res.status(200).send(r))
-    .catch(() => res.status(404).send({ message: 'Ошибка 404: Карточка не найдена' }));
+    .then((r) => {
+      if (!r) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      res.status(200).send(r);
+    })
+    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
 }
 
 function putLike(req, res) {
   return cardSchema
     .findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((r) => res.status(200).send(r))
+    .then((r) => {
+      if (!r) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      res.status(200).send(r);
+    })
     .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
 }
 
 function deleteLike(req, res) {
   return cardSchema
     .findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((r) => res.status(200).send(r))
+    .then((r) => {
+      if (!r) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      res.status(200).send(r);
+    })
     .catch(() => res.status(500).send({ message: 'Ошибка сервера' }));
 }
 
