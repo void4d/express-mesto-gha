@@ -22,6 +22,6 @@ app.use(cardsRouter);
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-}).then(() => console.log('connected to db'));
+});
 
 app.listen(PORT);
