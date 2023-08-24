@@ -12,16 +12,14 @@ function getUserById(req, res) {
 
   return userSchema
     .findById(userId)
-    .orFail(new Error('Неверный id'))
     .then((r) => {
+      if (!r) {
+        res.status(404).send({ message: 'Пользователь с таким id не найден' });
+      }
       res.status(200).send(r);
     })
     .catch((err) => {
-      if (err.message === 'Неверный id') {
-        return res.status(404).send({ message: 'Пользователь с таким id не найден' });
-      }
-
-      if (err.message === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Неверный id' });
       }
       return res.status(500).send({ message: 'Ошибка сервера' });
