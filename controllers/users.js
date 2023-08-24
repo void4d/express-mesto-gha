@@ -20,6 +20,10 @@ function getUserById(req, res) {
       if (err.message === 'Неверный id') {
         return res.status(404).send({ message: 'Пользователь с таким id не найден' });
       }
+
+      if (err.message === 'ValidationError') {
+        return res.status(400).send({ message: 'Неверный id' });
+      }
       return res.status(500).send({ message: 'Ошибка сервера' });
     });
 }
