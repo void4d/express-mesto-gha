@@ -9,12 +9,11 @@ function getUsers(req, res) {
 
 function getUserById(req, res) {
   const { userId } = req.params;
-  return userSchema.findById(userId).then((r) => {
-    if (r === null) {
-      return res.status(404).send({ message: 'Пользователь не найден' });
-    }
-    return res.status(200).send(r);
-  });
+
+  return userSchema
+    .findById(userId)
+    .then((r) => res.status(200).send(r))
+    .catch(() => res.status(404).send({ message: 'Пользователь не найден' }));
 }
 
 function createUser(req, res) {
