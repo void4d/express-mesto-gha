@@ -27,9 +27,10 @@ function getUserById(req, res) {
 }
 
 function createUser(req, res) {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
+  console.log(req.body)
   return userSchema
-    .create({ name, about, avatar })
+    .create({ name, about, avatar, email, password })
     .then((r) => res.status(201).send(r))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -45,9 +46,7 @@ function updateUser(req, res) {
 
   return userSchema
     .findByIdAndUpdate(req.user._id, { name, about }, { new: 'true', runValidators: 'true' })
-    .then((r) => {
-      res.status(200).send(r);
-    })
+    .then((r) => res.status(200).send(r))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Неверные данные' });

@@ -14,7 +14,7 @@ app.disable('x-powered-by');
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '64e7439af89ec12063bca2a2',
+    _id: '64f3551f29cba9b2c89bcce3',
   };
 
   next();
@@ -28,4 +28,4 @@ mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 });
 
-app.listen(PORT);
+app.listen(PORT, console.log('running'));
