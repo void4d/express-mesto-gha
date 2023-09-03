@@ -32,9 +32,9 @@ function getUserById(req, res) {
 }
 
 function getMyProfile(req, res) {
-  const token = req.user.token;
-
-  return userSchema.findById(token).then((r) => {
+  const id = req.user.id;
+  
+  return userSchema.findById(id).then((r) => {
     if (!r) {
       res.status(404).send({ message: 'Пользователь не найден' })
     }
@@ -119,7 +119,7 @@ function login(req, res) {
           return res.status(401).send({ message: 'Неверный пароль или почта' })
         }
 
-        const token = jwt.sign({ token: r.id }, JWT_SECRET, { expiresIn: '7d' })
+        const token = jwt.sign({ id: r.id }, JWT_SECRET, { expiresIn: '7d' })
 
         return res.status(200).send({ token })
       })
