@@ -8,7 +8,8 @@ function getCards(req, res) {
 }
 
 function createCard(req, res) {
-  const owner = req.user._id;
+  const owner = req.user.id;
+
   const { name, link } = req.body;
   return cardSchema
     .create({ name, link, owner })
@@ -22,13 +23,22 @@ function createCard(req, res) {
 }
 
 function deleteCard(req, res) {
+const owner = req.user.id;
+const  card  = req.params.cardId;
+
   return cardSchema
-    .findByIdAndDelete(req.params.cardId)
+    .findByIdAndDelete(card)
     .then((r) => {
+
       if (!r) {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      res.status(200).send(r);
+
+      if (r.owner.toString() !== owner) {
+        return res.status(401).send({ message: 'Нелья удалить чужую карточку'})
+      } else {
+        return res.status(200).send(r);
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {

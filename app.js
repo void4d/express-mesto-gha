@@ -7,8 +7,6 @@ const { createUser } = require('./controllers/users')
 const { login } = require('./controllers/users')
 const { auth } = require('./middlewares/auth')
 
-const JWT_SECRET = 'secretstring'
-
 const { PORT = 3000, DB_URL = 'mongodb://localhost:27017/mestodb' } = process.env
 
 const app = express()

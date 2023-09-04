@@ -32,19 +32,22 @@ function getUserById(req, res) {
 }
 
 function getMyProfile(req, res) {
-  const id = req.user.id;
-  
-  return userSchema.findById(id).then((r) => {
-    if (!r) {
-      res.status(404).send({ message: 'Пользователь не найден' })
-    }
-    res.status(200).send(r)
-  }).catch((err) => {
-    if (err.name === 'CastError') {
-      return res.status(400).send({ message: 'Неверный id' })
-    }
-    return res.status(500).send({ message: 'Ошибка сервера' })
-  })
+  const id = req.user.id
+
+  return userSchema
+    .findById(id)
+    .then((r) => {
+      if (!r) {
+        res.status(404).send({ message: 'Пользователь не найден' })
+      }
+      res.status(200).send(r)
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Неверный id' })
+      }
+      return res.status(500).send({ message: 'Ошибка сервера' })
+    })
 }
 
 function createUser(req, res) {
@@ -109,6 +112,7 @@ function login(req, res) {
 
   return userSchema
     .findOne({ email })
+    .select('+password')
     .then((r) => {
       if (!r) {
         return res.status(404).send({ message: 'Такого пользователя не существует' })
@@ -134,5 +138,5 @@ module.exports = {
   updateUser,
   updateAvatar,
   login,
-  getMyProfile
+  getMyProfile,
 }
