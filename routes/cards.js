@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { getCards, createCard, deleteCard, putLike, deleteLike } = require('../controllers/cards')
 const { Joi, celebrate } = require('celebrate')
-const regExp = new RegExp('^https?:\/\/(www\.)?\S+\.\S+\/?+')
+const regExp = new RegExp('^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$')
 
 router.get('/cards', getCards)
 router.post(

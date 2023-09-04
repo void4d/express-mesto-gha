@@ -14,7 +14,7 @@ const cardSchema = new mongoose.Schema({
     minlength: [2, 'Минимальная длина поля "link" - 2 символа'],
     validate: {
       validator: function(v) {
-        return /^https?:\/\/(www\.)?\S+\.\S+\/?+/.test(v)
+        return /^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$/.test(v)
       },
       message: 'Некорректный URL'
     }
