@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'secretstring'
+const UnauthorizedError = require('../errors/unauthorized-err')
 
 function auth(req, res, next) {
   const authorization = req.headers.authorization
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).send({ message: 'Необходима авторизация' })
+    next(new UnauthorizedError('Необходима авторизация'))
   }
 
   const token = authorization.replace('Bearer ', '')
@@ -14,7 +15,7 @@ function auth(req, res, next) {
   try {
     payload = jwt.verify(token, JWT_SECRET)
   } catch {
-    res.status(401).send({ message: 'Необходима авторизация' })
+    next(new UnauthorizedError('Необходима авторизация'))
   }
 
   req.user = payload
