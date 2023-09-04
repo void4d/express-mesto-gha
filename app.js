@@ -7,7 +7,7 @@ const { createUser } = require('./controllers/users')
 const { login } = require('./controllers/users')
 const { auth } = require('./middlewares/auth')
 const { handleError } = require('./middlewares/error-handler.js')
-const { Joi, celebrate } = require('celebrate')
+const { Joi, celebrate, errors } = require('celebrate')
 const regExp = new RegExp('^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$');
 
 const { PORT = 3000, DB_URL = 'mongodb://localhost:27017/mestodb' } = process.env
@@ -46,6 +46,8 @@ app.use(cardsRouter)
 app.use(userRouter)
 
 app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }))
+
+app.use(errors())
 
 mongoose.connect(DB_URL, {
   useNewUrlParser: true,
