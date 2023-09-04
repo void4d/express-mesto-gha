@@ -1,62 +1,67 @@
 const userSchema = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const NotFoundError = require('../errors/not-found-err')
+const ConflictError = require('../errors/conflict-err')
+const ForbiddenError = require('../errors/forbidden-err')
+const UnauthorizedError = require('../errors/unauthorized-err')
+const BadRequestError = require('../errors/bad-request-err')
 
 const SALT_ROUNDS = 10
 const JWT_SECRET = 'secretstring'
 
-function getUsers(req, res) {
+function getUsers(req, res, next) {
   return userSchema
     .find()
     .then((r) => res.status(200).send(r))
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }))
+    .catch(next)
 }
 
-function getUserById(req, res) {
+function getUserById(req, res, next) {
   const { userId } = req.params
 
   return userSchema
     .findById(userId)
     .then((r) => {
       if (!r) {
-        res.status(404).send({ message: 'Пользователь с таким id не найден' })
+        throw new NotFoundError('Пользователь с таким id не найден');
       }
       res.status(200).send(r)
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Неверный id' })
+        next(new BadRequestError('Неверный id'))
       }
-      return res.status(500).send({ message: 'Ошибка сервера' })
+      next(err);
     })
 }
 
-function getMyProfile(req, res) {
+function getMyProfile(req, res, next) {
   const id = req.user.id
 
   return userSchema
     .findById(id)
     .then((r) => {
       if (!r) {
-        res.status(404).send({ message: 'Пользователь не найден' })
+        throw new NotFoundError('Пользователь с таким id не найден');
       }
       res.status(200).send(r)
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Неверный id' })
+        next(new BadRequestError('Неверный id'))
       }
-      return res.status(500).send({ message: 'Ошибка сервера' })
+      next(err);
     })
 }
 
-function createUser(req, res) {
+function createUser(req, res, next) {
   const { name, about, avatar, email, password } = req.body
 
   bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
     return userSchema.findOne({ email }).then((r) => {
       if (r) {
-        return res.status(409).send({ message: 'Email уже используется' })
+        next(new ConflictError('Email уже используется'));
       }
 
       return userSchema
@@ -64,16 +69,16 @@ function createUser(req, res) {
         .then((r) => res.status(201).send(r))
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            return res.status(400).send({ message: 'Неверные данные' })
+            next(new BadRequestError('Неверные данные'))
           }
 
-          return res.status(500).send({ message: 'Ошибка сервера' })
+          next(err);
         })
     })
   })
 }
 
-function updateUser(req, res) {
+function updateUser(req, res, next) {
   const { name, about } = req.body
 
   return userSchema
@@ -81,13 +86,13 @@ function updateUser(req, res) {
     .then((r) => res.status(200).send(r))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Неверные данные' })
+        next(new BadRequestError('Неверные данные'))
       }
-      return res.status(500).send({ message: 'Ошибка сервера' })
+      next(err)
     })
 }
 
-function updateAvatar(req, res) {
+function updateAvatar(req, res, next) {
   const { avatar } = req.body
 
   return userSchema
@@ -97,17 +102,17 @@ function updateAvatar(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Неверные данные' })
+        next(new BadRequestError('Неверные данные'))
       }
-      return res.status(500).send({ message: 'Ошибка сервера' })
+      next(err)
     })
 }
 
-function login(req, res) {
+function login(req, res, next) {
   const { email, password } = req.body
 
   if (!email || !password) {
-    return res.status(400).send({ message: 'Почта или пароль не могут быть пустыми' })
+    next(new BadRequestError('Почта или пароль не могут быть пустыми'))
   }
 
   return userSchema
@@ -115,12 +120,12 @@ function login(req, res) {
     .select('+password')
     .then((r) => {
       if (!r) {
-        return res.status(404).send({ message: 'Такого пользователя не существует' })
+        next(new NotFoundError('Такого пользователя не существует'))
       }
 
       bcrypt.compare(password, r.password, (error, isValid) => {
         if (!isValid) {
-          return res.status(401).send({ message: 'Неверный пароль или почта' })
+          next(new UnauthorizedError('Неверный пароль или почта'))
         }
 
         const token = jwt.sign({ id: r.id }, JWT_SECRET, { expiresIn: '7d' })
@@ -128,7 +133,7 @@ function login(req, res) {
         return res.status(200).send({ token })
       })
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка сервера' }))
+    .catch(next)
 }
 
 module.exports = {

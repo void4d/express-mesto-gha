@@ -27,4 +27,8 @@ mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 })
 
+app.use((err, req, res, next) => {
+  res.status(500).send({ message: 'Ошибка сервера' });
+})
+
 app.listen(PORT, console.log('running'))
