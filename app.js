@@ -6,6 +6,7 @@ const cardsRouter = require('./routes/cards')
 const { createUser } = require('./controllers/users')
 const { login } = require('./controllers/users')
 const { auth } = require('./middlewares/auth')
+const { handleError } = require('./middlewares/error-handler.js')
 
 const { PORT = 3000, DB_URL = 'mongodb://localhost:27017/mestodb' } = process.env
 
@@ -27,8 +28,6 @@ mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 })
 
-app.use((err, req, res, next) => {
-  res.status(500).send({ message: 'Ошибка сервера' });
-})
+app.use(handleError)
 
 app.listen(PORT, console.log('running'))

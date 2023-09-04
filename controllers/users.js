@@ -23,15 +23,17 @@ function getUserById(req, res, next) {
     .findById(userId)
     .then((r) => {
       if (!r) {
-        new NotFoundError('Пользователь с таким id не найден');
+        throw new NotFoundError('Пользователь с таким id не найден')
       }
+
       res.status(200).send(r)
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Неверный id'))
+        return next(new BadRequestError('Неверный id'))
+      } else {
+        next(err)
       }
-      next(err);
     })
 }
 
@@ -42,15 +44,16 @@ function getMyProfile(req, res, next) {
     .findById(id)
     .then((r) => {
       if (!r) {
-        throw new NotFoundError('Пользователь с таким id не найден');
+        throw new NotFoundError('Пользователь с таким id не найден')
       }
       res.status(200).send(r)
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Неверный id'))
+      } else {
+        next(err)
       }
-      next(err);
     })
 }
 
@@ -60,7 +63,7 @@ function createUser(req, res, next) {
   bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
     return userSchema.findOne({ email }).then((r) => {
       if (r) {
-        next(new ConflictError('Email уже используется'));
+        throw new ConflictError('Email уже используется')
       }
 
       return userSchema
@@ -69,9 +72,9 @@ function createUser(req, res, next) {
         .catch((err) => {
           if (err.name === 'ValidationError') {
             next(new BadRequestError('Неверные данные'))
+          } else {
+            next(err)
           }
-
-          next(err);
         })
     })
   })
@@ -86,8 +89,9 @@ function updateUser(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Неверные данные'))
+      } else {
+        next(err)
       }
-      next(err)
     })
 }
 
@@ -102,8 +106,9 @@ function updateAvatar(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Неверные данные'))
+      } else {
+        next(err)
       }
-      next(err)
     })
 }
 
@@ -111,7 +116,7 @@ function login(req, res, next) {
   const { email, password } = req.body
 
   if (!email || !password) {
-    next(new BadRequestError('Почта или пароль не могут быть пустыми'))
+    throw new BadRequestError('Почта или пароль не могут быть пустыми')
   }
 
   return userSchema
@@ -119,12 +124,12 @@ function login(req, res, next) {
     .select('+password')
     .then((r) => {
       if (!r) {
-        next(new NotFoundError('Такого пользователя не существует'))
+        throw new NotFoundError('Такого пользователя не существует')
       }
 
       bcrypt.compare(password, r.password, (error, isValid) => {
         if (!isValid) {
-          next(new UnauthorizedError('Неверный пароль или почта'))
+          throw new UnauthorizedError('Неверный пароль или почта')
         }
 
         const token = jwt.sign({ id: r.id }, JWT_SECRET, { expiresIn: '7d' })
