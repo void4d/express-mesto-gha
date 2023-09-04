@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { getCards, createCard, deleteCard, putLike, deleteLike } = require('../controllers/cards')
 const { Joi, celebrate } = require('celebrate')
+const regExp = new RegExp('^https?:\/\/(www\.)?\S+\.\S+\/?+')
 
 router.get('/cards', getCards)
 router.post(
@@ -8,7 +9,7 @@ router.post(
   celebrate({
     body: {
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required().min(2),
+      link: Joi.string().required().min(2).pattern(regExp)
     },
   }),
   createCard
