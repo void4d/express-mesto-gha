@@ -21,11 +21,10 @@ function getUserById(req, res, next) {
 
   return userSchema
     .findById(userId)
+    .orFail(() => {
+      throw new NotFoundError('Пользователь с таким id не найден')
+    })
     .then((r) => {
-      if (!r) {
-        throw new NotFoundError('Пользователь с таким id не найден')
-      }
-
       res.status(200).send(r)
     })
     .catch((err) => {
@@ -81,7 +80,7 @@ function updateUser(req, res, next) {
 
   return userSchema
     .findByIdAndUpdate(req.user._id, { name, about }, { new: 'true', runValidators: 'true' })
-    .then((r) => res.status(200).send(r))
+    .then(() => res.status(200).send({ name, about }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Неверные данные'))
@@ -97,7 +96,7 @@ function updateAvatar(req, res, next) {
   return userSchema
     .findByIdAndUpdate(req.user._id, { avatar }, { new: 'true', runValidators: 'true' })
     .then((r) => {
-      res.status(200).send(r)
+      res.status(200).send({ avatar })
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -120,7 +119,7 @@ function login(req, res, next) {
     .select('+password')
     .then((r) => {
       if (!r) {
-        throw new NotFoundError('Такого пользователя не существует')
+        throw new UnauthorizedError('Такого пользователя не существует')
       }
 
       bcrypt.compare(password, r.password, (error, isValid) => {

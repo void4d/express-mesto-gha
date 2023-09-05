@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const regExp = new RegExp('^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$')
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: [2, 'Минимальная длина поля "name" - 2 символа'],
     maxlength: [30, 'Максимальная длина поля "name" - 30 символов'],
-    default: 'Жак-Ив-Кусто'
+    default: 'Жак-Ив Кусто'
   },
   avatar: {
     type: String,
     minlength: [2, 'Минимальная длина поля "avatar" - 2 символа'],
     validate: {
-      validator: (v) => validator.isURL(v),
+      validator: function(v) {
+        return regExp.test(v)
+      },
       message: 'Некорректный URL'
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'
@@ -21,7 +24,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: [2, 'Минимальная длина поля "about" - 2 символа'],
     maxlength: [30, 'Максимальная длина поля "about" - 30 символов'],
-    default: 'Исследователь океана'
+    default: 'Исследователь'
   },
   email: {
     type: String,

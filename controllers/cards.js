@@ -2,6 +2,7 @@ const cardSchema = require('../models/card')
 const NotFoundError = require('../errors/not-found-err')
 const UnauthorizedError = require('../errors/unauthorized-err')
 const BadRequestError = require('../errors/bad-request-err')
+const ForbiddenError = require('../errors/forbidden-err')
 
 function getCards(req, res, next) {
   return cardSchema
@@ -38,7 +39,7 @@ function deleteCard(req, res, next) {
       }
 
       if (r.owner.toString() !== owner) {
-        throw new UnauthorizedError('Нелья удалить чужую карточку')
+        throw new ForbiddenError('Нелья удалить чужую карточку')
       } else {
         return res.status(200).send(r)
       }
