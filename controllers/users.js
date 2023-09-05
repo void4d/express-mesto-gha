@@ -61,22 +61,18 @@ function createUser(req, res, next) {
   const { name, about, avatar, email, password } = req.body
 
   bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
-    return userSchema.findOne({ email }).then((r) => {
-      if (r) {
-        throw new ConflictError('Email уже используется')
-      }
-
       return userSchema
         .create({ name, about, avatar, email, password: hash })
         .then((r) => res.status(201).send({ name, about, avatar, email }))
         .catch((err) => {
           if (err.name === 'ValidationError') {
             next(new BadRequestError('Неверные данные'))
+          } else if (err.code === 11000) {
+            next(new ConflictError('Email уже используется'))
           } else {
             next(err)
           }
         })
-    })
   })
 }
 
