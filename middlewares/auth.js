@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'secretstring'
 const UnauthorizedError = require('../errors/unauthorized-err')
 
+
 function auth(req, res, next) {
   const authorization = req.headers.authorization
 

@@ -39,7 +39,7 @@
   "description": "",
   "main": "app.js",
   "keywords": [],
-  "author": "",
+  "author": "void4d",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.48.0",
