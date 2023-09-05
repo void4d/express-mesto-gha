@@ -68,7 +68,7 @@ function createUser(req, res, next) {
 
       return userSchema
         .create({ name, about, avatar, email, password: hash })
-        .then((r) => res.status(201).send(r))
+        .then((r) => res.status(201).send({ name, about, avatar, email }))
         .catch((err) => {
           if (err.name === 'ValidationError') {
             next(new BadRequestError('Неверные данные'))
@@ -137,7 +137,13 @@ function login(req, res, next) {
         return res.status(200).send({ token })
       })
     })
-    .catch(next)
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Неверные данные'))
+      } else {
+        next(err)
+      }
+    })
 }
 
 module.exports = {

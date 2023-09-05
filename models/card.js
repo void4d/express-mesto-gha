@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const regExp = new RegExp('^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$')
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -14,7 +15,7 @@ const cardSchema = new mongoose.Schema({
     minlength: [2, 'Минимальная длина поля "link" - 2 символа'],
     validate: {
       validator: function(v) {
-        return /^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$/.test(v)
+        return regExp.test(v)
       },
       message: 'Некорректный URL'
     }
