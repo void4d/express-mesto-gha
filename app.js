@@ -8,6 +8,7 @@ const { login } = require('./controllers/users')
 const { auth } = require('./middlewares/auth')
 const { handleError } = require('./middlewares/error-handler.js')
 const { Joi, celebrate, errors } = require('celebrate')
+const { requestLogger, errorLogger } = require('./middlewares/logger')
 const regExp = new RegExp('^(?:http(s)?:\/\/)?[\\w.-]+(?:\\.[\\w.-]+)+[\\w\\-._~:/?#[\\]@!$&\'()*+,;=.]+$');
 
 const { PORT = 3000, DB_URL = 'mongodb://localhost:27017/mestodb' } = process.env
@@ -17,6 +18,8 @@ const app = express()
 app.use(express.json())
 app.use(helmet())
 app.disable('x-powered-by')
+
+app.use(requestLogger);
 
 app.post(
   '/signin',
@@ -44,6 +47,8 @@ app.post(
 app.use(auth)
 app.use(cardsRouter)
 app.use(userRouter)
+
+app.use(errorLogger);
 
 app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }))
 
